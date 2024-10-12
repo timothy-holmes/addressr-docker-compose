@@ -4,7 +4,8 @@ services:
     container_name: elasticsearch
     environment:
       - discovery.type=single-node
-      - plugins.security.disabled=true
+      # Why is this here?
+      # - plugins.security.disabled=true
     ports:
       - "9200:9200"
       - "9300:9300"
