@@ -44,7 +44,7 @@ services:
       - addressr-network
     environment:
       - ELASTIC_PORT=9200
-      - ELASTIC_HOST=elasticsearch
+      - ELASTIC_HOST=10.0.20.2
       - ELASTIC_USERNAME=
       - ELASTIC_PASSWORD=
       - ELASTIC_PROTOCOL=
@@ -71,7 +71,7 @@ services:
       - addressr-network
     environment:
       - ELASTIC_PORT=9200
-      - ELASTIC_HOST=elasticsearch
+      - ELASTIC_HOST=10.0.20.2
       - ADDRESSR_INDEX_TIMEOUT=30s
       - ADDRESSR_INDEX_BACKOFF=1000
       - ADDRESSR_INDEX_BACKOFF_INCREMENT=1000
