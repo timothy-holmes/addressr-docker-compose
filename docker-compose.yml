@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.2.0
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+    ports:
+      - "9990:9200"   # Elasticsearch HTTP
+      - "9991:9300"   # Elasticsearch transport
+    networks:
+      - addressr-network
+
+  mongo:
+    image: mongo:4.0.11
+    container_name: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    volumes:
+      - mongo-data:/data/db
+    ports:
+      - "9992:27017"  # MongoDB
+    networks:
+      - addressr-network
+
+  addressr-api:
+    image: mountainpass/addressr:1.0.1
+    container_name: addressr-api
+    depends_on:
+      - elasticsearch
+      - mongo
+    ports:
+      - "9993:8080"  # Addressr API
+    networks:
+      - addressr-network
+    command: ["addressr-api"]
+
+  addressr-loader:
+    image: mountainpass/addressr:1.0.1
+    container_name: addressr-loader
+    depends_on:
+      - elasticsearch
+      - mongo
+    networks:
+      - addressr-network
+    command: ["addressr-loader"]
+
+networks:
+  addressr-network:
+    driver: bridge
+
+volumes:
+  mongo-data:
