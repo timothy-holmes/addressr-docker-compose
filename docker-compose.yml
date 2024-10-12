@@ -4,10 +4,10 @@ services:
     container_name: elasticsearch
     environment:
       - discovery.type=single-node
-      - plugins.security.disabled=true   # Added to match Opensearch configuration
+      - plugins.security.disabled=true
     ports:
-      - "9200:9200"   # Elasticsearch HTTP
-      - "9300:9300"   # Elasticsearch transport
+      - "9200:9200"
+      - "9300:9300"
     networks:
       - addressr-network
 
@@ -20,26 +20,49 @@ services:
     volumes:
       - mongo-data:/data/db
     ports:
-      - "27017:27017"  # MongoDB
+      - "27017:27017"
     networks:
       - addressr-network
 
   addressr-api:
-    image: mountainpass/addressr:1.0.1
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        BASE_IMAGE: node:16.3.0-alpine3.13
+        MAINTAINER: "Your Name <your-email@example.com>"
+        PACKAGE: "@mountainpass/addressr"
+        VERSION: "1.1.2"
+        PACKAGE_TGZ: "addressr-1.1.2.tar.gz"  # Replace with the correct tarball from the release
     container_name: addressr-api
     depends_on:
       - elasticsearch
       - mongo
     ports:
-      - "8080:8080"  # Addressr API
+      - "8080:8080"
     networks:
       - addressr-network
     environment:
       - ELASTIC_PORT=9200
       - ELASTIC_HOST=elasticsearch
+      - ELASTIC_USERNAME=
+      - ELASTIC_PASSWORD=
+      - ELASTIC_PROTOCOL=
+      - ADDRESSR_INDEX_TIMEOUT=30s
+      - ADDRESSR_INDEX_BACKOFF=1000
+      - ADDRESSR_INDEX_BACKOFF_INCREMENT=1000
+      - ADDRESSR_INDEX_BACKOFF_MAX=10000
 
   addressr-loader:
-    image: mountainpass/addressr:1.0.1
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        BASE_IMAGE: node:16.3.0-alpine3.13
+        MAINTAINER: "Your Name <your-email@example.com>"
+        PACKAGE: "@mountainpass/addressr"
+        VERSION: "1.1.2"
+        PACKAGE_TGZ: "addressr-1.1.2.tar.gz"  # Replace with the correct tarball from the release
     container_name: addressr-loader
     depends_on:
       - elasticsearch
@@ -53,12 +76,11 @@ services:
       - ADDRESSR_INDEX_BACKOFF=1000
       - ADDRESSR_INDEX_BACKOFF_INCREMENT=1000
       - ADDRESSR_INDEX_BACKOFF_MAX=10000
-      # Optional env vars for enabling geocodes
-      # Uncomment the following lines if you want to enable geocodes
+      # Optional geocode settings
       - ADDRESSR_ENABLE_GEO=1
       - NODE_OPTIONS=--max_old_space_size=6000
       # Optional: Limit addresses to specific states
-      - COVERED_STATES=VIC  # Example: Limiting to Victoria and South Australia
+      - COVERED_STATES=VIC  # Example: Limiting to Victoria
 
 networks:
   addressr-network:
