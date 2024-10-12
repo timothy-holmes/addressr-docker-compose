@@ -6,6 +6,8 @@ services:
       - discovery.type=single-node
       # Why is this here?
       # - plugins.security.disabled=true
+      - xpack.ml.enabled=false
+      - xpack.security.enabled=false
     ports:
       - "9200:9200"
       - "9300:9300"
@@ -53,6 +55,7 @@ services:
       - ADDRESSR_INDEX_BACKOFF=1000
       - ADDRESSR_INDEX_BACKOFF_INCREMENT=1000
       - ADDRESSR_INDEX_BACKOFF_MAX=10000
+    command: ["addressr-server-2"]
 
   addressr-loader:
     build:
@@ -82,6 +85,7 @@ services:
       - NODE_OPTIONS=--max_old_space_size=6000
       # Optional: Limit addresses to specific states
       - COVERED_STATES=VIC  # Example: Limiting to Victoria
+    command: ["addressr-loader"]
 
 networks:
   addressr-network:
