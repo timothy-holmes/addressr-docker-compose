@@ -4,6 +4,7 @@ services:
     container_name: elasticsearch
     environment:
       - discovery.type=single-node
+      - plugins.security.disabled=true   # Added to match Opensearch configuration
     ports:
       - "9200:9200"   # Elasticsearch HTTP
       - "9300:9300"   # Elasticsearch transport
@@ -34,8 +35,8 @@ services:
     networks:
       - addressr-network
     environment:
-      - ELASTICSEARCH_URL=http://elasticsearch:9200
-      - MONGO_URL=mongodb://mongo:27017
+      - ELASTIC_PORT=9200
+      - ELASTIC_HOST=elasticsearch
 
   addressr-loader:
     image: mountainpass/addressr:1.0.1
@@ -46,8 +47,18 @@ services:
     networks:
       - addressr-network
     environment:
-      - ELASTICSEARCH_URL=http://elasticsearch:9200
-      - MONGO_URL=mongodb://mongo:27017
+      - ELASTIC_PORT=9200
+      - ELASTIC_HOST=elasticsearch
+      - ADDRESSR_INDEX_TIMEOUT=30s
+      - ADDRESSR_INDEX_BACKOFF=1000
+      - ADDRESSR_INDEX_BACKOFF_INCREMENT=1000
+      - ADDRESSR_INDEX_BACKOFF_MAX=10000
+      # Optional env vars for enabling geocodes
+      # Uncomment the following lines if you want to enable geocodes
+      - ADDRESSR_ENABLE_GEO=1
+      - NODE_OPTIONS=--max_old_space_size=6000
+      # Optional: Limit addresses to specific states
+      - COVERED_STATES=VIC  # Example: Limiting to Victoria and South Australia
 
 networks:
   addressr-network:
